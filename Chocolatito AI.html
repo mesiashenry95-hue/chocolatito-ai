@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chocolatito AI - Tu Asistente Inteligente</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuentes de Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        choco: {
+                            dark: '#030712',
+                            card: '#0b132b',
+                            panel: '#111e38',
+                            border: '#1d2d50',
+                            blue: '#2563eb',
+                            electric: '#3b82f6',
+                            cyan: '#06b6d4',
+                            glow: '#1d4ed8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #030712;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Efecto de orbe azul brillante animado */
+        .orb-glow {
+            position: relative;
+        }
+        .orb-glow::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140%;
+            height: 140%;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.4) 0%, rgba(6, 182, 212, 0.25) 50%, rgba(0, 0, 0, 0) 70%);
+            filter: blur(30px);
+            z-index: 0;
+            animation: pulse-blue 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse-blue {
+            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.95; }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #030712;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1d2d50;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+
+        pre {
+            background-color: #020617 !important;
+            border: 1px solid #1e293b;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+        }
+
+        .typing-indicator span {
+            animation: blink 1.4s infinite both;
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #38bdf8;
+            margin: 0 2px;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes blink {
+            0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+            40% { opacity: 1; transform: scale(1.2); }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden bg-[#030712] text-slate-100">
+
+    <!-- Encabezado Superior -->
+    <header class="border-b border-blue-950/80 bg-[#060b1c]/80 backdrop-blur-md px-4 py-3 flex items-center justify-between z-10 shadow-lg shadow-blue-950/20">
+        <div class="flex items-center space-x-3">
+            <div class="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-700 via-indigo-600 to-cyan-400 text-white font-black text-xl shadow-xl shadow-blue-600/30">
+                C
+                <span class="absolute -top-1 -right-1 w-3 h-3 bg-cyan-400 rounded-full border-2 border-slate-950 animate-pulse"></span>
+            </div>
+            <div>
+                <div class="flex items-center space-x-2">
+                    <h1 class="font-extrabold text-base tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-cyan-300 to-indigo-400">
+                        CHOCOLATITO AI
+                    </h1>
+                    <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-blue-950 text-cyan-300 border border-blue-700/50">ONLINE</span>
+                </div>
+                <p class="text-xs text-blue-300/80">IA Inteligente y Real</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <button id="clearChatBtn" class="text-xs px-3 py-1.5 rounded-lg border border-blue-900/60 text-slate-300 hover:text-white hover:bg-blue-950/50 transition flex items-center space-x-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                <span class="hidden sm:inline">Limpiar chat</span>
+            </button>
+            <div class="h-4 w-px bg-blue-900/60"></div>
+            <div class="flex items-center space-x-1.5 text-xs text-cyan-400 bg-cyan-950/50 border border-cyan-800/40 px-2.5 py-1 rounded-full">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                <span>Gemini API Conectado</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Área Principal de Chat -->
+    <main id="chatContainer" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 max-w-4xl mx-auto w-full">
+        
+        <!-- Pantalla de Bienvenida -->
+        <div id="welcomeScreen" class="py-10 flex flex-col items-center justify-center text-center my-auto space-y-6">
+            <div class="orb-glow my-2">
+                <div class="relative z-10 w-24 h-24 rounded-3xl bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-400 p-0.5 shadow-2xl">
+                    <div class="w-full h-full bg-[#070e23] rounded-[22px] flex items-center justify-center">
+                        <svg class="w-12 h-12 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-xl space-y-2">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white">
+                    ¡Hola, Mesías! ¿Qué quieres preguntar hoy?
+                </h2>
+                <p class="text-blue-200/80 text-sm sm:text-base">
+                    Soy <span class="text-cyan-300 font-semibold">Chocolatito AI</span>. Puedo responder cualquier duda en tiempo real, escribir código o buscar información actual en Internet.
+                </p>
+            </div>
+
+            <!-- Sugerencias Rápidas -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl text-left pt-4">
+                <button onclick="useQuickPrompt('¿Quién eres y cómo me puedes ayudar?')" class="group p-4 rounded-xl bg-[#0b132b] border border-blue-950 hover:border-cyan-500/50 hover:bg-[#0f1b3d] transition text-left flex flex-col justify-between shadow-md">
+                    <div>
+                        <div class="text-xs text-cyan-400 font-semibold mb-1 flex items-center space-x-1">
+                            <span>🤖 Asistente</span>
+                        </div>
+                        <p class="text-sm text-slate-200 group-hover:text-white">¿Quién eres y qué puedes hacer?</p>
+                    </div>
+                    <span class="text-xs text-blue-400/70 mt-2">Preguntar ➔</span>
+                </button>
+
+                <button onclick="useQuickPrompt('Dame 5 consejos para aprender a programar rápido')" class="group p-4 rounded-xl bg-[#0b132b] border border-blue-950 hover:border-blue-500/50 hover:bg-[#0f1b3d] transition text-left flex flex-col justify-between shadow-md">
+                    <div>
+                        <div class="text-xs text-blue-400 font-semibold mb-1 flex items-center space-x-1">
+                            <span>💻 Programación</span>
+                        </div>
+                        <p class="text-sm text-slate-200 group-hover:text-white">Consejos para aprender código</p>
+                    </div>
+                    <span class="text-xs text-blue-400/70 mt-2">Preguntar ➔</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="messagesList" class="space-y-5"></div>
+
+    </main>
+
+    <!-- Barra de entrada -->
+    <footer class="p-3 sm:p-4 border-t border-blue-950/80 bg-[#060b1c]/90 backdrop-blur-lg">
+        <div class="max-w-4xl mx-auto space-y-2">
+            
+            <div class="flex items-center justify-between text-xs px-1 text-slate-400">
+                <label class="flex items-center space-x-2 cursor-pointer select-none">
+                    <input type="checkbox" id="webSearchToggle" class="rounded bg-slate-900 border-blue-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-slate-950">
+                    <span class="flex items-center space-x-1 text-blue-200">
+                        <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <span>Activar Búsqueda Web en Vivo (Google)</span>
+                    </span>
+                </label>
+                <span class="hidden sm:inline text-blue-400/60">Chocolatito AI · Gemini API</span>
+            </div>
+
+            <form id="chatForm" class="relative flex items-end bg-[#0b132b] border border-blue-900/60 rounded-2xl focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/30 transition-all p-1.5 shadow-xl">
+                <textarea 
+                    id="userInput" 
+                    rows="1" 
+                    placeholder="Escribe lo que quieras a Chocolatito AI..." 
+                    class="w-full bg-transparent text-slate-100 placeholder-slate-400 text-sm sm:text-base px-3 py-2 focus:outline-none resize-none max-h-32 min-h-[44px]"
+                ></textarea>
+
+                <button 
+                    type="submit" 
+                    id="sendBtn" 
+                    class="ml-2 p-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold shadow-lg shadow-blue-600/30 hover:opacity-90 active:scale-95 transition disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+                >
+                    <svg class="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </footer>
+
+    <div id="toast" class="fixed bottom-20 right-5 transform translate-y-10 opacity-0 transition-all duration-300 bg-blue-950 border border-blue-800 text-cyan-200 text-xs px-4 py-2.5 rounded-xl shadow-2xl flex items-center space-x-2 pointer-events-none z-50">
+        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span id="toastMsg">Texto copiado</span>
+    </div>
+
+    <!-- Script con conexión real a la API de Gemini -->
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const messagesList = document.getElementById('messagesList');
+        const chatForm = document.getElementById('chatForm');
+        const userInput = document.getElementById('userInput');
+        const webSearchToggle = document.getElementById('webSearchToggle');
+        const clearChatBtn = document.getElementById('clearChatBtn');
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+
+        // Historial de conversación para la IA
+        let conversationHistory = [];
+
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                chatForm.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        function useQuickPrompt(text) {
+            userInput.value = text;
+            chatForm.dispatchEvent(new Event('submit'));
+        }
+
+        function showToast(message) {
+            toastMsg.textContent = message;
+            toast.classList.remove('translate-y-10', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+            }, 2500);
+        }
+
+        function copyText(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text);
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            }
+            showToast('¡Copiado al portapapeles!');
+        }
+
+        function appendUserMessage(text) {
+            welcomeScreen.style.display = 'none';
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'flex justify-end';
+            msgDiv.innerHTML = `
+                <div class="max-w-[85%] sm:max-w-[75%] bg-gradient-to-r from-blue-700 to-indigo-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-lg shadow-blue-900/20">
+                    <p class="text-sm whitespace-pre-wrap leading-relaxed">${escapeHtml(text)}</p>
+                </div>
+            `;
+            messagesList.appendChild(msgDiv);
+            scrollToBottom();
+        }
+
+        function showTypingIndicator() {
+            const indicatorDiv = document.createElement('div');
+            indicatorDiv.id = 'typingIndicator';
+            indicatorDiv.className = 'flex items-start space-x-3';
+            indicatorDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center text-white text-xs font-bold shadow-md flex-shrink-0">
+                    C
+                </div>
+                <div class="bg-[#0b132b] border border-blue-950 rounded-2xl rounded-tl-sm px-4 py-3 text-slate-300">
+                    <div class="typing-indicator flex items-center h-5">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            `;
+            messagesList.appendChild(indicatorDiv);
+            scrollToBottom();
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+
+        function appendBotMessage(text, sources = [], query = '') {
+            removeTypingIndicator();
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'flex items-start space-x-3';
+
+            let formattedContent = formatBotResponse(text);
+
+            let searchBoxHtml = '';
+            if (sources.length > 0 || (webSearchToggle.checked && query)) {
+                const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                let sourcesList = '';
+                if (sources.length > 0) {
+                    sourcesList = '<div class="mt-2 space-y-1">' + sources.map(s => 
+                        `<a href="${s.uri}" target="_blank" class="block text-cyan-300 hover:underline truncate">🔗 ${escapeHtml(s.title || s.uri)}</a>`
+                    ).join('') + '</div>';
+                }
+
+                searchBoxHtml = `
+                    <div class="mt-3 p-2.5 rounded-xl bg-[#030712] border border-blue-950 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-blue-300 flex items-center space-x-1.5 font-semibold">
+                                <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                <span>Búsqueda Web en Vivo</span>
+                            </span>
+                            <a href="${searchUrl}" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:underline font-semibold flex items-center space-x-1">
+                                <span>Google ↗</span>
+                            </a>
+                        </div>
+                        ${sourcesList}
+                    </div>
+                `;
+            }
+
+            const rawTextEscaped = escapeHtml(text).replace(/'/g, "\\'");
+
+            msgDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center text-white text-xs font-extrabold shadow-md flex-shrink-0 mt-0.5">
+                    C
+                </div>
+                <div class="max-w-[88%] sm:max-w-[80%] space-y-2">
+                    <div class="bg-[#0b132b]/95 border border-blue-950 text-slate-200 rounded-2xl rounded-tl-sm p-4 shadow-xl text-sm leading-relaxed">
+                        ${formattedContent}
+                        ${searchBoxHtml}
+                    </div>
+                    <div class="flex items-center space-x-2 text-[11px] text-blue-400/70 px-1">
+                        <button onclick="copyText('${rawTextEscaped}')" class="hover:text-cyan-300 transition flex items-center space-x-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 012-2v-8a2 2 0 01-2-2h-8a2 2 0 01-2 2v8a2 2 0 012 2z"></path></svg>
+                            <span>Copiar respuesta</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            messagesList.appendChild(msgDiv);
+            scrollToBottom();
+        }
+
+        function formatBotResponse(text) {
+            let escaped = escapeHtml(text);
+            
+            escaped = escaped.replace(/```([\s\S]*?)```/g, function(match, code) {
+                return `<pre><code>${code.trim()}</code></pre>`;
+            });
+
+            escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>');
+
+            let parts = escaped.split(/(<pre>[\s\S]*?<\/pre>)/g);
+            for (let i = 0; i < parts.length; i++) {
+                if (!parts[i].startsWith('<pre>')) {
+                    parts[i] = parts[i].replace(/\n/g, '<br>');
+                }
+            }
+
+            return parts.join('');
+        }
+
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Llamada REAL a la API de Gemini
+        async function fetchGeminiResponse(userPrompt, useWebSearch) {
+            const systemPrompt = "Eres 'Chocolatito AI', un asistente de inteligencia artificial creado especialmente para ayudar a Mesías de forma amigable, directa, natural y con tono positivo en español. Responde siempre de forma clara, detallada y útil, sin usar frases plantillas repetitivas.";
+
+            const apiKey = ""; // Runtime proporciona la clave si está vacía
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            // Agregar el mensaje del usuario al historial
+            conversationHistory.push({
+                role: 'user',
+                parts: [{ text: userPrompt }]
+            });
+
+            const payload = {
+                contents: conversationHistory,
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                }
+            };
+
+            // Si está activada la búsqueda web
+            if (useWebSearch) {
+                payload.tools = [{ "google_search": {} }];
+            }
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al conectar con el servidor de la IA.');
+                }
+
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const replyText = candidate.content.parts[0].text;
+
+                    // Guardar respuesta del modelo en historial
+                    conversationHistory.push({
+                        role: 'model',
+                        parts: [{ text: replyText }]
+                    });
+
+                    // Extraer fuentes si se usó búsqueda web
+                    let sources = [];
+                    const groundingMetadata = candidate.groundingMetadata;
+                    if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                        sources = groundingMetadata.groundingAttributions
+                            .map(attr => ({
+                                uri: attr.web?.uri,
+                                title: attr.web?.title
+                            }))
+                            .filter(s => s.uri && s.title);
+                    }
+
+                    return { text: replyText, sources };
+                } else {
+                    return { text: "No pude generar una respuesta en este momento. Inténtalo de nuevo.", sources: [] };
+                }
+            } catch (err) {
+                console.error(err);
+                return { text: "Hubo un pequeño error de conexión. Por favor intenta enviarlo de nuevo.", sources: [] };
+            }
+        }
+
+        chatForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const query = userInput.value.trim();
+            if (!query) return;
+
+            const isWebSearch = webSearchToggle.checked;
+
+            appendUserMessage(query);
+
+            userInput.value = '';
+            userInput.style.height = 'auto';
+
+            showTypingIndicator();
+
+            const { text, sources } = await fetchGeminiResponse(query, isWebSearch);
+            appendBotMessage(text, sources, query);
+        });
+
+        clearChatBtn.addEventListener('click', function() {
+            messagesList.innerHTML = '';
+            welcomeScreen.style.display = 'flex';
+            conversationHistory = [];
+            showToast('Chat limpiado con éxito');
+        });
+    </script>
+</body>
+</html>
